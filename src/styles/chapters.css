@@ -1,0 +1,204 @@
+/*
+ * Every chapter shares one frame: a 12-column grid inside the page margin,
+ * between the two HUD bars. Text always sits on the left margin or the
+ * centre axis — never floating at random positions.
+ */
+.chapter {
+  position: absolute;
+  inset: 0;
+  padding: var(--hud-h) var(--margin);
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+}
+
+.chapter button {
+  pointer-events: auto;
+}
+
+/* ── 01 DESCENT ─────────────────────────────────────────── */
+
+.ch1 {
+  color: var(--surface-ink);
+  grid-template-rows: auto 1fr auto;
+}
+
+.ch1__intro {
+  grid-column: 1 / span 3;
+  grid-row: 1;
+  padding-top: clamp(var(--s-6), 6vh, var(--s-8));
+}
+
+.ch1__intro .body-copy {
+  color: var(--surface-soft);
+  max-width: 29ch;
+}
+
+.ch1__head {
+  grid-column: 1 / span 8;
+  grid-row: 3;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--s-4), 2.6vh, var(--s-6));
+  padding-bottom: clamp(var(--s-5), 5vh, var(--s-8));
+}
+
+.ch1 .display--1 {
+  margin-left: -0.05em;
+}
+
+.ch1 .lede {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  color: var(--surface-ink);
+}
+
+.ch1 .lede::before {
+  content: '';
+  width: var(--s-7);
+  height: 1px;
+  background: var(--accent);
+}
+
+/* ── 02 MEMORY ──────────────────────────────────────────── */
+
+.ch2 {
+  color: var(--deep-ink);
+}
+
+.ch2__island {
+  position: absolute;
+  left: var(--margin);
+  top: calc(var(--hud-h) + clamp(var(--s-5), 7vh, var(--s-9)));
+  width: min(48vw, 780px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--s-4), 2.4vh, var(--s-6));
+}
+
+.ch2__text {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-4);
+  margin-left: 32%;
+}
+
+.ch2 .body-copy {
+  color: color-mix(in srgb, var(--deep-ink) 86%, transparent);
+}
+
+.ch2 .caption {
+  color: var(--deep-soft);
+}
+
+/* ── 03 AWAKENING ───────────────────────────────────────── */
+
+.ch3 {
+  color: var(--deep-ink);
+}
+
+.ch3__during {
+  position: absolute;
+  inset: var(--hud-h) var(--margin);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(var(--s-5), 6vh, var(--s-8)) 0 clamp(var(--s-5), 5vh, var(--s-8));
+}
+
+.ch3__statement {
+  max-width: 24em;
+  font-size: clamp(1.5rem, 2.5vw, 2.6rem);
+  line-height: 1.12;
+  text-shadow:
+    0 0 28px var(--deep-bg-warm),
+    0 0 10px var(--deep-bg-warm);
+}
+
+.ch3__statement em {
+  color: var(--accent-glow);
+}
+
+.ch3__final {
+  position: absolute;
+  left: var(--margin);
+  right: var(--margin);
+  top: 61vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(var(--s-4), 2.4vh, var(--s-5));
+}
+
+.ch3 .display--3 {
+  white-space: nowrap;
+}
+
+.ch3__final .line-button {
+  margin-top: var(--s-2);
+}
+
+.ch3__body {
+  max-width: 40ch;
+  color: color-mix(in srgb, var(--deep-ink) 82%, transparent);
+}
+
+.colophon {
+  margin-top: var(--s-2);
+  text-wrap: balance;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--deep-soft);
+}
+
+/* ── narrow screens ─────────────────────────────────────── */
+
+@media (max-width: 760px) {
+  .ch1 {
+    grid-template-rows: 1fr auto;
+  }
+
+  .ch1__intro {
+    display: none;
+  }
+
+  .ch1__head {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .display--1 {
+    font-size: clamp(3.2rem, 15.5vw, 6rem);
+  }
+
+  .ch2__island {
+    width: auto;
+    right: var(--margin);
+    top: calc(var(--hud-h) + var(--s-4));
+  }
+
+  .display--2 {
+    font-size: clamp(2.6rem, 12.5vw, 5rem);
+  }
+
+  .ch2__text {
+    margin-left: 0;
+  }
+
+  .ch2 .caption {
+    display: none;
+  }
+
+  .ch3__final {
+    top: 50vh;
+  }
+
+  .ch3 .display--3 {
+    white-space: normal;
+    font-size: clamp(2.6rem, 12vw, 5rem);
+  }
+}

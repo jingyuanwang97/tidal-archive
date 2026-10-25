@@ -1,0 +1,308 @@
+/* ── threshold ──────────────────────────────────────────── */
+
+.threshold {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: var(--hud-h) var(--margin);
+  color: var(--surface-ink);
+  text-align: center;
+}
+
+.threshold__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(var(--s-5), 3.4vh, var(--s-7));
+  max-width: 44rem;
+}
+
+.threshold__hand {
+  transform-origin: 24.4px 25.4px;
+  animation: tide-hand 14s linear infinite;
+}
+
+@keyframes tide-hand {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.threshold__title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(2.1rem, 4.4vw, 4.4rem);
+  line-height: 1.04;
+  letter-spacing: -0.005em;
+  max-width: 15ch;
+  text-wrap: balance;
+}
+
+.threshold__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--s-4) var(--s-6);
+}
+
+.line-button__wave {
+  display: block;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.1;
+}
+
+.quiet-button {
+  padding: var(--s-3) 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--surface-soft);
+  background: linear-gradient(currentColor, currentColor) 0 calc(100% - 6px) / 0 1px no-repeat;
+  transition:
+    background-size var(--dur-calm) var(--ease-flow),
+    color var(--dur-quick) var(--ease-flow);
+}
+
+.quiet-button:hover,
+.quiet-button:focus-visible {
+  color: var(--surface-ink);
+  background-size: 100% 1px;
+}
+
+.threshold__note {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  color: var(--surface-soft);
+  line-height: 1.8;
+}
+
+.threshold__note span {
+  text-wrap: balance;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .threshold__hand {
+    animation: none;
+  }
+}
+
+/* ── sound toggle ───────────────────────────────────────── */
+
+.hud__end {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: clamp(var(--s-4), 2.4vw, var(--s-7));
+}
+
+.sound {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2) 0;
+  opacity: 0.55;
+  transition: opacity var(--dur-quick) var(--ease-flow);
+}
+
+.sound[aria-pressed='true'],
+.sound:hover {
+  opacity: 1;
+}
+
+.sound__wave polyline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 620px) {
+  .sound__label {
+    display: none;
+  }
+}
+
+/* ── listening caption ──────────────────────────────────── */
+
+.listen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 25;
+  max-width: min(30ch, calc(100vw - 32px));
+  pointer-events: none;
+  opacity: 0;
+  color: var(--deep-ink);
+  text-shadow:
+    0 0 14px var(--deep-bg),
+    0 0 4px var(--deep-bg);
+  will-change: transform, opacity;
+}
+
+html[data-chapter='1'] .listen {
+  color: var(--surface-ink);
+  text-shadow:
+    0 0 14px var(--surface-bg),
+    0 0 4px var(--surface-bg);
+}
+
+.listen__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-1) var(--s-3);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.listen__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: listen-pulse 1.1s var(--ease-weight) infinite alternate;
+}
+
+@keyframes listen-pulse {
+  from {
+    transform: scale(0.6);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.listen__note {
+  opacity: 0.66;
+}
+
+.listen__memory {
+  margin-top: var(--s-2);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.05rem, 1.35vw, 1.4rem);
+  line-height: 1.24;
+  text-wrap: pretty;
+}
+
+
+/* ── narrator subtitles ─────────────────────────────────── */
+
+.subtitle {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--hud-h) + var(--s-3));
+  z-index: 24;
+  width: max-content;
+  max-width: min(42ch, calc(100vw - 2 * var(--margin)));
+  transform: translateX(-50%) translateY(6px);
+  pointer-events: none;
+  text-align: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.05rem, 1.4vw, 1.45rem);
+  line-height: 1.3;
+  color: var(--deep-ink);
+  text-shadow:
+    0 0 16px var(--deep-bg),
+    0 0 5px var(--deep-bg);
+  opacity: 0;
+  transition:
+    opacity 700ms var(--ease-flow),
+    transform 700ms var(--ease-flow);
+}
+
+.subtitle.is-on {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+html[data-chapter='1'] .subtitle {
+  color: var(--surface-ink);
+  text-shadow:
+    0 0 16px var(--surface-bg),
+    0 0 5px var(--surface-bg);
+}
+
+/* ── leaving an echo ────────────────────────────────────── */
+
+.ch3__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--s-4);
+  margin-top: var(--s-2);
+}
+
+.line-button--echo {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.echo-hint {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+  min-height: 46px;
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-glow);
+}
+
+.echo-hint .quiet-button {
+  color: var(--deep-soft);
+}
+
+.echo-hint .quiet-button:hover,
+.echo-hint .quiet-button:focus-visible {
+  color: var(--deep-ink);
+}
+
+.forget {
+  margin-left: var(--s-4);
+  padding: var(--s-1) 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--deep-soft);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+}
+
+.forget:hover,
+.forget:focus-visible {
+  color: var(--accent-glow);
+}
+
+/* while a gesture is being drawn the page holds still, on touch screens too */
+html.is-drawing,
+html.is-drawing body {
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* in the closing frame the colophon steps aside while the narrator speaks */
+.colophon {
+  transition: opacity 600ms var(--ease-flow);
+}
+
+html:has(.subtitle.is-on) .ch3__final .colophon {
+  opacity: 0 !important;
+}

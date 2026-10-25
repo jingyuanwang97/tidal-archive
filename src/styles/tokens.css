@@ -1,0 +1,59 @@
+/*
+ * TIDAL ARCHIVE — design tokens
+ *
+ * Colour: two light regimes of one ink system, joined by a single accent.
+ *   Surface  fog-paper ground, deep-sea ink (Ch1, above the water line)
+ *   Deep     abyssal ground, bone ink (Ch2–3, below it); the deep warms as it wakes
+ *   Accent   recorder vermilion — the ink of tide-gauge pens. Used only for
+ *            the still point, the tide hand, the record being read, the crests.
+ */
+:root {
+  --surface-bg: #e2e3dc;
+  --surface-ink: #11191c;
+  --surface-soft: #5c6461;
+
+  --deep-bg: #0b1214;
+  --deep-bg-warm: #110d0b;
+  --deep-ink: #e6e0d2;
+  --deep-soft: #8a8f89;
+
+  --accent: #d9472b;
+  --accent-glow: #f2865e;
+
+  /* written per frame by the engine as the water line passes the interface */
+  --hud-top: var(--surface-ink);
+  --hud-bottom: var(--surface-ink);
+
+  /* type */
+  --font-display: 'Bodoni Moda Variable', 'Bodoni 72', Didot, 'Times New Roman', serif;
+  --font-mono: 'Fragment Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --t-display-1: clamp(3.5rem, 10.4vw, 11.75rem);
+  --t-display-2: clamp(3rem, 7.1vw, 8.25rem);
+  --t-display-3: clamp(2.6rem, 6.2vw, 7.25rem);
+  --t-lede: clamp(1.25rem, 1.72vw, 1.875rem);
+  --t-body: clamp(0.97rem, 1vw, 1.075rem);
+  --t-label: 0.6875rem;
+  --t-micro: 0.625rem;
+  --track-label: 0.16em;
+
+  /* space — 4 px base, page margin and gutter scale with the viewport */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --margin: clamp(20px, 4.4vw, 72px);
+  --gutter: clamp(12px, 1.5vw, 24px);
+  --hud-h: clamp(56px, 8vh, 80px);
+
+  /* motion */
+  --ease-flow: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-weight: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-quick: 280ms;
+  --dur-calm: 640ms;
+}

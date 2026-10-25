@@ -1,0 +1,7 @@
+node_modules
+dist
+voice-samples
+*.log
+.DS_Store
+.claude
+tsconfig.tsbuildinfo

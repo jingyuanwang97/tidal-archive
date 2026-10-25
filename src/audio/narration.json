@@ -1,0 +1,30 @@
+{
+  "voice": { "name": "am_michael", "lang": "en-gb", "speed": 0.9, "deepen": 0.93 },
+  "lines": {
+    "descent": "Every wave carries a memory.",
+    "memory": "Everything leaves an echo. Listen.",
+    "awakening": "At the still point, every trace converges.",
+    "remembers": "The ocean remembers.",
+
+    "surge": "The water rose four metres, and took the harbour lights with it.",
+    "hull": "A ship passed at three ten. Its engine is still in the water, somewhere.",
+    "song": "A single voice, singing at a pitch no other whale answers.",
+    "ice": "A glacier let go of ten thousand winters, in a single breath.",
+    "swell": "Waves, from a storm that never reached land.",
+    "rain": "Rain on the open sea, heard from forty metres down.",
+    "thunder": "Thunder, far off. No ship logged the weather.",
+    "shrimp": "A whole reef, crackling at once, like frying light.",
+    "icesong": "Ice, singing to itself as the night cools it.",
+    "chain": "A chain dragging on the seabed, link by link.",
+    "school": "Forty thousand fish, turning at the same moment.",
+    "tide": "The tide, arriving twice a day, as promised.",
+    "still": "Here the tide turns... but nothing moves.",
+    "chorus": "Every trace, sounding together.",
+
+    "echo-invite": "Leave something for the sea to keep. Draw slowly.",
+    "echo-kept": "Kept. The ocean will remember this.",
+    "echo-return": "You have been here before. The sea kept your echo.",
+    "echo-yours": "This one is yours.",
+    "answered": "For the first time... someone answered."
+  }
+}

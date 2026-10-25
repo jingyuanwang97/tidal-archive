@@ -1,0 +1,220 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--surface-bg);
+}
+
+body {
+  margin: 0;
+  background: var(--surface-bg);
+  color: var(--surface-ink);
+  font-family: var(--font-display);
+  font-size: var(--t-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+p,
+h1,
+h2 {
+  margin: 0;
+  font-weight: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 5px;
+}
+
+.has-liquid-cursor,
+.has-liquid-cursor * {
+  cursor: none !important;
+}
+
+/* ── layers ─────────────────────────────────────────────── */
+
+.stage,
+.cursor {
+  position: fixed;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.stage {
+  z-index: 0;
+}
+
+.scenes {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hud {
+  z-index: 3;
+}
+
+.cursor {
+  z-index: 30;
+}
+
+html.is-locked {
+  overflow: hidden;
+}
+
+.track {
+  position: relative;
+  z-index: -1;
+  height: 1100vh;
+}
+
+/* until fonts and timelines are ready nothing typographic is shown */
+.app:not(.is-ready) .scenes,
+.app:not(.is-ready) .hud {
+  visibility: hidden;
+}
+
+/* ── shared typographic system ──────────────────────────── */
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 460;
+  text-transform: uppercase;
+  letter-spacing: -0.012em;
+  line-height: 0.86;
+  font-kerning: normal;
+}
+
+/* articles are always set as lowercase italics — the same rule in every title */
+.display em {
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.62em;
+  vertical-align: 0.42em;
+  margin-right: 0.08em;
+}
+
+.display--1 {
+  font-size: var(--t-display-1);
+}
+.display--2 {
+  font-size: var(--t-display-2);
+}
+.display--3 {
+  font-size: var(--t-display-3);
+}
+
+.mask {
+  display: block;
+  overflow: hidden;
+  /* room for diacritics and italic overhang inside the mask */
+  padding: 0.04em 0.06em 0.06em 0;
+  margin: -0.04em -0.06em -0.06em 0;
+}
+
+.line-in {
+  display: block;
+  will-change: transform;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.label__num {
+  color: var(--accent);
+}
+
+.label__rule {
+  display: block;
+  width: var(--s-7);
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+.lede {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--t-lede);
+  line-height: 1.22;
+  letter-spacing: 0.005em;
+}
+
+.body-copy {
+  font-size: var(--t-body);
+  line-height: 1.56;
+  max-width: 34ch;
+  text-wrap: pretty;
+}
+
+/* the one button style: a hairline frame, mono caps, the mark turns on hover */
+.line-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-5) var(--s-3) var(--s-4);
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border: 1px solid color-mix(in srgb, currentColor 38%, transparent);
+  transition: border-color var(--dur-calm) var(--ease-flow);
+}
+
+.line-button__mark {
+  transition: transform 900ms var(--ease-weight);
+}
+
+.line-button:hover,
+.line-button:focus-visible {
+  border-color: var(--accent);
+}
+
+.line-button:hover .line-button__mark,
+.line-button:focus-visible .line-button__mark {
+  transform: rotate(-120deg);
+}
+
+.caption {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
