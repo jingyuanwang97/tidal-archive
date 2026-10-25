@@ -125,3 +125,15 @@ The build uses relative paths (`base: './'`), so `dist/` runs from any static ho
 - `prefers-reduced-motion`: instant intro, ambient motion slowed to ~10 %, no cursor trail or ripples, un-smoothed scroll.
 - Touch / narrow screens: re-composed layouts, 22 lines instead of 30, no cursor effects, full-width text island.
 - In dev builds `window.__tidal` exposes the story state and engine for visual QA.
+
+## Credits
+
+- **Direction & curation** — [jingyuanwang97](https://github.com/jingyuanwang97)
+- **Creative brief** (the prompt this piece answers) — GPT-6
+- **Design & code** — Claude Opus 5.5, in Claude Code
+- **Narrator voice** — [Kokoro TTS](https://github.com/hexgrad/kokoro) v1.0 (Apache-2.0), voice `am_michael`, British pronunciation
+- **Type** — [Bodoni Moda](https://github.com/indestructible-type/Bodoni) and [Fragment Mono](https://github.com/weiweihuanghuang/fragment-mono), both SIL Open Font License, via Fontsource
+- **Libraries** — React, Vite, TypeScript, [GSAP](https://gsap.com) (ScrollTrigger, ScrollToPlugin)
+
+The narration was generated offline with Kokoro. Every other sound is synthesized live in the browser, and the drawing is
+procedural: no third-party images or audio recordings are used.
