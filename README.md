@@ -103,6 +103,24 @@ in the visitor's local time. The chapter-03 climax spins the crests ahead, and s
 - **The whale's answer**: hold the still point in chapter 03 for five seconds. For the first time, a second, lower whale
   answers the 52 Hz song from the other side, and the two rings light up in call and response.
 
+## A whale, far off (hidden)
+
+Stay at the surface (chapter 01, at rest) for an unbroken 90–150 seconds and, once, a short reach of distant sea may
+appear in the fog between the opening words and the title, and a whale may break it. After each sighting a new random
+wait begins. Leaving chapter 01, or putting the page in the background, cancels the timer, and returning starts it over.
+Nothing announces it (`src/engine/Whale.ts`).
+
+- **Five acts**, dealt from a shuffled bag so none repeats back to back: **breach** (leaps clear, turns, falls on its side),
+  **blow** (surfaces twice, the spout drifting off), **fluke** (arches and lifts its tail clear before sounding),
+  **spyhop** (rises upright with its flippers on the surface, holds, sinks), **pod** (a mother and calf rolling along together).
+- Drawn beneath the contours in the site's own language: translucent ink with a hairline edge, hazed toward the fog by
+  distance, visible only above the water. On phones it sits at the screen's edge below the tide clock. It always keeps
+  clear of text, the tide clock and the tide hand's label, and skips a layout with no open water. With sound on, a splash or
+  a breath is barely audible, from where it was seen. With reduced motion, a single still silhouette fades in and out instead.
+- **Test entry** (not linked anywhere): `?whale=breach` · `blow` · `fluke` · `spyhop` · `pod` · `random` · `all` plays at the top
+  of chapter 01 after the intro, and `?whale=lab` shows a small panel to play each act and watch the timer. In dev builds
+  the instance is also at `window.__tidal.whale`.
+
 ## Touch
 
 Phones get their own effects: a tap drops ink on the water (a bead and three spreading hairline rings, and the

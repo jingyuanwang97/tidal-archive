@@ -16,6 +16,7 @@ import type { Knockout } from './knockout'
 import { RECORDS, readHeadU, recordId, recordLine } from './records'
 import { listen } from './listen'
 import { m2Phase, nextHighWater } from './tideClock'
+import { WhaleWatch } from './Whale'
 
 /**
  * THE AMPHIDROME
@@ -89,6 +90,8 @@ export class TidalStage {
   private b0 = 0
   private b1 = 0
   private island: Rect | null = null
+  /** Narrow screens: the band between the header and the chapter-01 title the tide clock must fit. */
+  private heroBox: { top: number; bottom: number } | null = null
   // chapter 03 vortex → emblem
   private c3x = 0
   private c3y = 0
@@ -108,6 +111,8 @@ export class TidalStage {
   private echo: { wave: number[]; reveal: number; date: string } | null = null
   /** 0..1 — the whale has been answered; set by the engine. */
   answer = 0
+  /** The hidden sighting of chapter 01. */
+  readonly whale: WhaleWatch
   private camX = 0
   private camY = 0
   private camRot = 0
@@ -130,6 +135,7 @@ export class TidalStage {
     if (!ctx) throw new Error('Canvas 2D unavailable')
     this.ctx = ctx
     this.grain = this.makeGrain()
+    this.whale = new WhaleWatch(reduced)
   }
 
   /** A static field of film grain, composited over each pass. */
@@ -156,6 +162,13 @@ export class TidalStage {
 
   get echoLine() {
     return this.echo ? this.lines.length - 1 : -1
+  }
+
+  setHeroBox(box: { top: number; bottom: number } | null) {
+    const same = box && this.heroBox && Math.abs(box.top - this.heroBox.top) < 1 && Math.abs(box.bottom - this.heroBox.bottom) < 1
+    if (same) return
+    this.heroBox = box
+    if (this.mobile && this.W > 1) this.buildLayout()
   }
 
   setKnockouts(list: Knockout[]) {
@@ -188,9 +201,18 @@ export class TidalStage {
     const N = (mobile ? 22 : 30) + (this.echo ? 1 : 0)
     const S = Math.min(W, H)
 
-    this.r1max = mobile ? Math.min(W * 0.37, H * 0.24) : Math.min(H * 0.41, W * 0.285)
+    this.r1max = Math.min(H * 0.41, W * 0.285)
     this.c1x = mobile ? W * 0.5 : W * 0.655
-    this.c1y = mobile ? H * 0.37 : H * 0.475
+    this.c1y = H * 0.475
+    if (mobile) {
+      // the clock, its bezel and hour labels (≈54 px beyond the outer contour)
+      // are centred in the space the header and the title leave free
+      const top = this.heroBox?.top ?? H * 0.09
+      const bottom = this.heroBox?.bottom ?? H * 0.64
+      this.r1max = Math.max(60, Math.min(W * 0.37, H * 0.24, (bottom - top) / 2 - 54))
+      this.c1y = (top + bottom) / 2
+    }
+    this.whale.setScene({ W, H, mobile, c1x: this.c1x, c1y: this.c1y, r1max: this.r1max })
     const r1min = this.r1max * 0.06
     const eccX = -this.r1max * 0.17
     const eccY = -this.r1max * 0.13
@@ -635,6 +657,14 @@ export class TidalStage {
     }
   }
 
+  /** Where chapter 01's tide-hand label sits — the whale keeps its distance. */
+  get handLabel() {
+    const inner = this.lines[0]
+    if (!inner) return null
+    const R = this.r1max + (this.mobile ? 30 : 44) + 26
+    return { x: inner.c1x + Math.cos(this.tide) * R, y: inner.c1y + Math.sin(this.tide) * R }
+  }
+
   get tideAngle() {
     return this.tide
   }
@@ -693,6 +723,8 @@ export class TidalStage {
     ctx.fillStyle = rgba(bg)
     ctx.fillRect(0, 0, W, H)
     if (!surface) this.drawGlow()
+    // far off, beneath the chart: a whale, now and then
+    else this.whale.draw(ctx, pal, bg)
 
     const settle = easeInOutCubic(st.settle)
     const bandness = smoothstep(0.55, 1, st.spread) * (1 - smoothstep(0, 0.45, st.gather))

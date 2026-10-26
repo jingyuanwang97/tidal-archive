@@ -10,8 +10,13 @@ import { story } from './engine/story'
 import { listen } from './engine/listen'
 import { SoundEngine } from './audio/SoundEngine'
 import { echoGesture, forgetEcho, loadEcho } from './engine/echo'
+import { WHALE_ACTS, type WhaleAct } from './engine/Whale'
+import { WhaleLab } from './components/WhaleLab'
 
 const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+/** Hidden test entry for the chapter-01 whale: ?whale=<act> | all | random | lab. Not linked anywhere. */
+const whaleParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('whale') : null
 
 export default function App() {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -58,11 +63,19 @@ export default function App() {
       onChapter: setChapter,
       getIsland: () => islandRef.current?.getBoundingClientRect() ?? null,
       getTitle: () => root.querySelector<HTMLElement>('#ch1-title'),
+      getWhaleText: () => ({
+        intro: root.querySelector('.ch1__intro .body-copy')?.getBoundingClientRect() ?? null,
+        head: root.querySelector('.ch1__head')?.getBoundingClientRect() ?? null,
+      }),
       canListen: () => enteredRef.current,
       onEchoMode: setEchoMode,
       onEchoKept: () => setHasEcho(true),
     })
     engineRef.current = engine
+    if (whaleParam && whaleParam !== 'lab') {
+      const what = whaleParam === 'all' || whaleParam === 'random' ? whaleParam : (whaleParam as WhaleAct)
+      if (what === 'all' || what === 'random' || WHALE_ACTS.includes(what)) engine.whale.request(what)
+    }
 
     // an echo left on an earlier visit is the newest stratum of the drawing
     const saved = loadEcho()
@@ -98,7 +111,7 @@ export default function App() {
 
     if (import.meta.env.DEV) {
       // Inspection hook for visual QA: drive the ticker by hand when the page is throttled.
-      ;(window as unknown as { __tidal: unknown }).__tidal = { gsap, ScrollTrigger, story, engine, sound, listen }
+      ;(window as unknown as { __tidal: unknown }).__tidal = { gsap, ScrollTrigger, story, engine, sound, listen, whale: engine.whale }
     }
 
     return () => {
@@ -151,6 +164,7 @@ export default function App() {
     setHasEcho(false)
   }, [sound])
 
+  const getWhale = useCallback(() => engineRef.current?.whale ?? null, [])
   const navigate = useCallback((i: number) => scrollToChapter(i, reduced), [])
   const again = useCallback(() => scrollToChapter(0, reduced), [])
 
@@ -198,6 +212,8 @@ export default function App() {
       <div className="track" ref={trackRef} aria-hidden="true" />
 
       {!entered && <Threshold onEnter={enter} />}
+
+      {whaleParam === 'lab' && <WhaleLab getWhale={getWhale} />}
 
       <canvas className="cursor" ref={cursorRef} aria-hidden="true" />
     </div>

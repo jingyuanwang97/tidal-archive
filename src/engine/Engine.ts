@@ -9,6 +9,7 @@ import { readKnockouts } from './knockout'
 import { armTime, attachListen, listen } from './listen'
 import { STILL_POINT, recordFor, type RecordInfo } from './records'
 import { ECHO_MAX_SECONDS, echoGesture, gestureToWave, saveEcho, type Echo } from './echo'
+import type { WhaleText } from './Whale'
 import type { SoundEngine } from '../audio/SoundEngine'
 
 export interface HudRefs {
@@ -35,6 +36,8 @@ export interface EngineOptions {
   onChapter: (index: number) => void
   getIsland: () => DOMRect | null
   getTitle: () => HTMLElement | null
+  /** The chapter-01 text the whale's stretch of sea must keep clear of. */
+  getWhaleText: () => WhaleText
   /** Listening is unavailable until the visitor has entered. */
   canListen: () => boolean
   /** Leaving an echo: the drawing mode changed, or an echo was kept. */
@@ -68,6 +71,10 @@ export class Engine {
   private answered = false
   private answerAge = -1
   private detachEcho: () => void
+  private onVisibility = () => {
+    // a page in the background breaks the visitor's stay: the sighting's timer starts over
+    if (document.hidden) this.stage.whale.dwell = 0
+  }
 
   constructor(private opts: EngineOptions) {
     this.stage = new TidalStage(opts.stage, this.pal, opts.reduced)
@@ -83,6 +90,10 @@ export class Engine {
       onGesture: () => opts.sound.init(),
     })
     this.detachEcho = this.attachEchoDrawing()
+    this.stage.whale.setText(opts.getWhaleText)
+    this.stage.whale.setAvoid(() => this.stage.handLabel)
+    this.stage.whale.onCue = (cue, x01, size) => opts.sound.whaleCue(cue, x01, size)
+    document.addEventListener('visibilitychange', this.onVisibility)
     this.resize()
     this.ro = new ResizeObserver(() => this.resize())
     this.ro.observe(document.documentElement)
@@ -101,6 +112,10 @@ export class Engine {
   measureIsland() {
     const r = this.opts.getIsland()
     this.stage.setIsland(r ? { x0: r.left, y0: r.top, x1: r.right, y1: r.bottom } : null)
+    // narrow screens fit the tide clock between the header and the chapter-01 title
+    const head = this.opts.getWhaleText().head
+    const bar = document.querySelector('.hud--top')?.getBoundingClientRect()
+    this.stage.setHeroBox(head && bar ? { top: bar.bottom + 8, bottom: head.top - 12 } : null)
   }
 
   private tick = (_time: number, deltaTime: number) => {
@@ -110,6 +125,7 @@ export class Engine {
     this.updateListen(dt)
     this.updateEcho()
     this.updateAnswer(dt)
+    this.stage.whale.update(dt, this.whaleWatchable())
     // the hero title is only on screen near the top of the story
     this.stage.setKnockouts(story.time < 1.4 ? readKnockouts(this.opts.getTitle(), this.measure) : [])
     this.stage.render(dt)
@@ -197,6 +213,21 @@ export class Engine {
     listen.active = false
     this.opts.sound.stopHold()
     this.opts.sound.hush(0.5, 2)
+  }
+
+  get whale() {
+    return this.stage.whale
+  }
+
+  /** Only at the surface, at rest, with the visitor here and the page in view. */
+  private whaleWatchable() {
+    return (
+      this.opts.canListen() &&
+      story.introMarks > 0.999 &&
+      story.time < 0.2 &&
+      !document.hidden &&
+      echoGesture.mode === 'off'
+    )
   }
 
   private updateAnswer(dt: number) {
@@ -377,6 +408,7 @@ export class Engine {
     this.detachPointer()
     this.detachListen()
     this.detachEcho()
+    document.removeEventListener('visibilitychange', this.onVisibility)
     this.endListen()
     this.cancelEcho()
     document.documentElement.classList.remove('has-liquid-cursor')

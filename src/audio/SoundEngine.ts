@@ -404,6 +404,33 @@ export class SoundEngine {
     setTimeout(() => v.stop(1.4), seconds * 1000)
   }
 
+  /**
+   * A whale far off: a muffled splash or the breath of a blow, very quiet,
+   * from where it was seen. Never louder than something you might have imagined.
+   */
+  whaleCue(cue: 'splash' | 'blow', x01: number, size = 1) {
+    if (!this.ctx || !this.enabled) return
+    const ctx = this.ctx
+    const t = ctx.currentTime
+    const splash = cue === 'splash'
+    const src = ctx.createBufferSource()
+    src.buffer = splash ? this.kit.brown : this.kit.pink
+    const f = ctx.createBiquadFilter()
+    f.type = splash ? 'lowpass' : 'bandpass'
+    f.frequency.value = splash ? 380 : 620
+    f.Q.value = splash ? 0.7 : 0.8
+    const g = ctx.createGain()
+    const peak = (splash ? 0.16 : 0.07) * size
+    g.gain.setValueAtTime(0, t)
+    g.gain.linearRampToValueAtTime(peak, t + (splash ? 0.03 : 0.28))
+    g.gain.exponentialRampToValueAtTime(0.0008, t + (splash ? 1.9 : 1.7))
+    const p = ctx.createStereoPanner()
+    p.pan.value = panFor(x01)
+    src.connect(f).connect(g).connect(p).connect(this.recordBus)
+    src.start(t, Math.random() * 2)
+    src.stop(t + 2.1)
+  }
+
   /** The 52 Hz whale is answered: a second, lower voice from the other side. */
   answerWhale() {
     if (!this.ctx) return

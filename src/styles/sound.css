@@ -306,3 +306,54 @@ html.is-drawing body {
 html:has(.subtitle.is-on) .ch3__final .colophon {
   opacity: 0 !important;
 }
+
+/* ── whale lab (?whale=lab only) ────────────────────────── */
+
+.whale-lab {
+  position: fixed;
+  right: var(--margin);
+  bottom: calc(var(--hud-h) + var(--s-3));
+  z-index: 26;
+  display: grid;
+  gap: var(--s-2);
+  max-width: 300px;
+  padding: var(--s-3) var(--s-4);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--surface-ink);
+  background: color-mix(in srgb, var(--surface-bg) 88%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.whale-lab__title {
+  color: var(--accent);
+}
+
+.whale-lab__acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-2);
+}
+
+.whale-lab__acts button {
+  padding: 3px 7px;
+  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.whale-lab__acts button:hover {
+  border-color: var(--accent);
+}
+
+.whale-lab__status {
+  font-variant-numeric: tabular-nums;
+}
+
+.whale-lab__note {
+  opacity: 0.6;
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
