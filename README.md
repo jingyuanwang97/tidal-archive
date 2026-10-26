@@ -105,10 +105,16 @@ in the visitor's local time. The chapter-03 climax spins the crests ahead, and s
 
 ## A whale, far off (hidden)
 
-Stay at the surface (chapter 01, at rest) for an unbroken 90–150 seconds and, once, a short reach of distant sea may
-appear in the fog between the opening words and the title, and a whale may break it. After each sighting a new random
-wait begins. Leaving chapter 01, or putting the page in the background, cancels the timer, and returning starts it over.
-Nothing announces it (`src/engine/Whale.ts`).
+Linger at the surface (chapter 01, at rest) and a short reach of distant sea may appear in the fog between the opening
+words and the title, and a whale may break it. Nothing announces it (`src/engine/Whale.ts`). The waits are random:
+
+| | Unbroken stay before a sighting |
+| --- | --- |
+| First | 25–55 s, only once the opening words have been read |
+| After that | 60–120 s, rarer, so it stays a chance and never becomes a loop |
+| Back at the surface after the whole descent | 12–25 s, once |
+
+Leaving chapter 01 starts the timer over. A page in the background only pauses it.
 
 - **Five acts**, dealt from a shuffled bag so none repeats back to back: **breach** (leaps clear, turns, falls on its side),
   **blow** (surfaces twice, the spout drifting off), **fluke** (arches and lifts its tail clear before sounding),

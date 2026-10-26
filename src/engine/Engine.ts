@@ -9,7 +9,7 @@ import { readKnockouts } from './knockout'
 import { armTime, attachListen, listen } from './listen'
 import { STILL_POINT, recordFor, type RecordInfo } from './records'
 import { ECHO_MAX_SECONDS, echoGesture, gestureToWave, saveEcho, type Echo } from './echo'
-import type { WhaleText } from './Whale'
+import type { WhaleText, WhaleWatchState } from './Whale'
 import type { SoundEngine } from '../audio/SoundEngine'
 
 export interface HudRefs {
@@ -71,10 +71,6 @@ export class Engine {
   private answered = false
   private answerAge = -1
   private detachEcho: () => void
-  private onVisibility = () => {
-    // a page in the background breaks the visitor's stay: the sighting's timer starts over
-    if (document.hidden) this.stage.whale.dwell = 0
-  }
 
   constructor(private opts: EngineOptions) {
     this.stage = new TidalStage(opts.stage, this.pal, opts.reduced)
@@ -93,7 +89,6 @@ export class Engine {
     this.stage.whale.setText(opts.getWhaleText)
     this.stage.whale.setAvoid(() => this.stage.handLabel)
     this.stage.whale.onCue = (cue, x01, size) => opts.sound.whaleCue(cue, x01, size)
-    document.addEventListener('visibilitychange', this.onVisibility)
     this.resize()
     this.ro = new ResizeObserver(() => this.resize())
     this.ro.observe(document.documentElement)
@@ -125,7 +120,8 @@ export class Engine {
     this.updateListen(dt)
     this.updateEcho()
     this.updateAnswer(dt)
-    this.stage.whale.update(dt, this.whaleWatchable())
+    if (story.settle > 0.85) this.stage.whale.markDescent()
+    this.stage.whale.update(dt, this.whaleState())
     // the hero title is only on screen near the top of the story
     this.stage.setKnockouts(story.time < 1.4 ? readKnockouts(this.opts.getTitle(), this.measure) : [])
     this.stage.render(dt)
@@ -219,15 +215,11 @@ export class Engine {
     return this.stage.whale
   }
 
-  /** Only at the surface, at rest, with the visitor here and the page in view. */
-  private whaleWatchable() {
-    return (
-      this.opts.canListen() &&
-      story.introMarks > 0.999 &&
-      story.time < 0.2 &&
-      !document.hidden &&
-      echoGesture.mode === 'off'
-    )
+  /** Watching only at the surface, at rest, with the visitor here; a hidden page pauses. */
+  private whaleState(): WhaleWatchState {
+    const here = this.opts.canListen() && story.introMarks > 0.999 && story.time < 0.2 && echoGesture.mode === 'off'
+    if (!here) return 'away'
+    return document.hidden ? 'pause' : 'watch'
   }
 
   private updateAnswer(dt: number) {
@@ -408,7 +400,6 @@ export class Engine {
     this.detachPointer()
     this.detachListen()
     this.detachEcho()
-    document.removeEventListener('visibilitychange', this.onVisibility)
     this.endListen()
     this.cancelEcho()
     document.documentElement.classList.remove('has-liquid-cursor')

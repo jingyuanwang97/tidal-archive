@@ -24,8 +24,20 @@ export type WhaleAct = (typeof WHALE_ACTS)[number]
 export type WhaleCue = 'splash' | 'blow'
 
 const DURATION: Record<WhaleAct, number> = { breach: 8.5, blow: 11, fluke: 9.5, spyhop: 9, pod: 13 }
-/** Seconds of unbroken stay before a sighting; drawn again after each one. */
-export const WHALE_WAIT = [90, 150] as const
+/**
+ * Seconds of unbroken stay at the surface before a sighting, drawn at random.
+ * The first comes only once the opening words have been read; later ones are
+ * rarer, so it stays a chance and never becomes a loop; a visitor back at the
+ * surface after the whole descent is met sooner.
+ */
+export const WHALE_WAITS = {
+  first: [25, 55],
+  again: [60, 120],
+  afterDescent: [12, 25],
+} as const
+
+/** watch: at the surface, at rest — the timer runs. pause: page hidden — nothing moves, nothing is lost. away: anywhere else — the timer starts over. */
+export type WhaleWatchState = 'watch' | 'pause' | 'away'
 
 const DEG = Math.PI / 180
 const N = 26
@@ -115,15 +127,19 @@ export interface WhaleStatus {
 }
 
 export class WhaleWatch {
-  /** Seconds of unbroken eligible stay so far. */
+  /** Seconds of unbroken stay at the surface so far. */
   dwell = 0
-  nextAt = rand(...WHALE_WAIT)
+  nextAt = rand(...WHALE_WAITS.first)
+  /** Sightings so far in this visit. */
+  seen = 0
   show: Show | null = null
   onCue: ((cue: WhaleCue, x01: number, size: number) => void) | null = null
 
   private bag: WhaleAct[] = []
   private last: WhaleAct | null = null
   private queue: WhaleAct[] = []
+  /** The visitor has been all the way down since the last sighting. */
+  private descended = false
   private scene: WhaleScene | null = null
   private text: () => WhaleText = () => ({ intro: null, head: null })
   private avoid: () => { x: number; y: number } | null = () => null
@@ -148,6 +164,19 @@ export class WhaleWatch {
   /** A point to keep clear of (the tide hand's label, which follows the Moon). */
   setAvoid(fn: () => { x: number; y: number } | null) {
     this.avoid = fn
+  }
+
+  /** The visitor reached the end of the story: the next sighting at the surface comes sooner. */
+  markDescent() {
+    if (this.descended) return
+    this.descended = true
+    if (!this.show) this.rewait()
+  }
+
+  private rewait() {
+    this.dwell = 0
+    const [a, b] = this.descended ? WHALE_WAITS.afterDescent : this.seen ? WHALE_WAITS.again : WHALE_WAITS.first
+    this.nextAt = rand(a, b)
   }
 
   /** Development: queue an act (or all five) to play the next time chapter 01 is at rest. */
@@ -178,25 +207,22 @@ export class WhaleWatch {
     return act
   }
 
-  /**
-   * @param eligible chapter 01 at rest, visitor inside, page visible.
-   * Leaving (or hiding the page) cancels the timer; returning starts it over.
-   */
-  update(dt: number, eligible: boolean) {
+  /** Leaving chapter 01 cancels the timer and returning starts it over; a hidden page only pauses it. */
+  update(dt: number, state: WhaleWatchState) {
+    if (state === 'pause') return
     const s = this.show
     if (s) {
       s.t += dt
-      if (!eligible && !s.leaving) s.leaving = true
+      if (state === 'away' && !s.leaving) s.leaving = true
       if (s.leaving) s.fade -= dt * 2.6
       this.advanceShow(s, dt)
       if (s.t >= s.dur || s.fade <= 0) {
         this.show = null
-        this.dwell = 0
-        this.nextAt = rand(...WHALE_WAIT)
+        this.rewait()
       }
       return
     }
-    if (!eligible) {
+    if (state === 'away') {
       this.dwell = 0
       return
     }
@@ -214,8 +240,7 @@ export class WhaleWatch {
     const r = this.scene && this.region(this.scene, this.text())
     if (!r) {
       // no open water in this layout: try again after another wait
-      this.dwell = 0
-      this.nextAt = rand(...WHALE_WAIT)
+      this.rewait()
       return
     }
     // keep clear of the tide hand's label, wherever the Moon has put it
@@ -225,13 +250,14 @@ export class WhaleWatch {
       const clear = (x: number) => Math.abs(x - avoid.x) > r.half + 50
       const options = [r.x0, r.x1, rand(r.x0, r.x1), ...(r.alt ?? [])].filter(clear)
       if (!options.length) {
-        this.dwell = 0
-        this.nextAt = rand(...WHALE_WAIT)
+        this.rewait()
         return
       }
       cx = options[Math.floor(Math.random() * options.length)]
     } else if (r.alt && Math.random() < 0.5) cx = r.alt[0]
     const still = this.reduced
+    this.seen++
+    this.descended = false
     this.show = {
       act: still ? 'fluke' : act,
       t: 0,
